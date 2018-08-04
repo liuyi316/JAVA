@@ -1,0 +1,77 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+
+public class AutoCheckText {
+	
+	static String TEXT1 = "K:\\Users\\test1.txt";
+	static String TEXT2 = "K:\\Users\\test2.txt";
+	static String RESULT_FILE_PATH = "K:\\Users\\result.txt";
+	
+	public static int lineNum = 0;
+	
+	public static void main(String[] args) {
+		File text1 = new File(TEXT1);
+        File text2 = new File(TEXT2);
+        BufferedReader t1 = null;
+        BufferedReader t2 = null;
+        BufferedWriter rbw = null;
+        try {
+        	t1 = new BufferedReader(new FileReader(text1));
+        	t2 = new BufferedReader(new FileReader(text2));
+        	t1.mark(90000000);
+            rbw = new BufferedWriter(new FileWriter(RESULT_FILE_PATH));
+            String lineText = null;
+            while ((lineText = t2.readLine()) != null) {
+                String searchText = lineText.trim();
+                if(searchText.length() != 0) {
+                	 System.out.println(searchText);
+                	 searchAndSignProcess(t1, searchText, rbw);
+                }
+                //lineText = t2.readLine();
+            }
+            rbw.write("重复个数:"+lineNum);
+            rbw.close();
+        }catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+        	e.printStackTrace();
+        } 
+		
+
+
+	}
+
+	private static void searchAndSignProcess(BufferedReader t1, String searchText, BufferedWriter rbw) throws IOException{
+		
+		String lineStr = "-\n";
+		if(searchText == null)
+			return;
+		if("".equals(searchText)) {
+			rbw.write(lineStr);
+			return;
+		}
+		String lineText = null;
+		
+		while ((lineText = t1.readLine()) != null) {
+            String comparedLine = lineText.trim();
+            if (comparedLine.contains(searchText)) {
+                lineStr = comparedLine;
+                System.out.println("找到重复:"+searchText);
+                rbw.write(searchText);
+                rbw.newLine();
+                lineNum++;
+                break;
+            }           
+        }
+        t1.reset();
+        //System.out.println("done");
+			
+	}
+
+}
