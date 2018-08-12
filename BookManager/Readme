@@ -1,0 +1,86 @@
+BookManager总结		传到github上
+
+功能实现书单的记录管理
+
+页面
+1.登录界面，实现用户登录
+2.待看书单界面，实现增加，删除功能
+3.已看书单界面，可以选择待看书单的书添加到已看书单
+
+分类
+1.Model层   实体
+User
+BooksToRead
+BooksBeReaded
+BooksToReadTableModel
+BooksBeReadedTableModel
+需要显示查改的需要进行封装，方便传到不同的层和窗口进行数据的操作
+2.Util
+一些工具，用JDBC进行数据库的连接
+3.dao   数据操作层
+UserDao
+BooksToReadedDao
+BooksBeReadedDao
+这个层主要是接受表示层打包的数据实体，然后到数据库进行增删查看操作，然后再打包返回数据实体，从而进行判断和显示
+4.frame   前台界面的展示
+LoginFrame
+MainFrame
+AddDateScoreFrame
+BooksReadedFrame
+
+遇到过哪些问题
+1.数据库连接，查询要熟悉
+private static String url = "jdbc:mysql://localhost:3306/bookmanager?useSSL=false";
+	private static String userName = "root";
+	private static String passWord = "admin123456";
+	
+	public static Connection getConnection() throws Exception{
+		Class.forName("com.mysql.cj.jdbc.Driver");
+		Connection con = DriverManager.getConnection(url, userName, passWord);
+		return con;
+	}
+Connection con = dbutil.getConnection();
+String sql = "select * from tb_booksbereaded order by date;";
+		PreparedStatement pstmt = con.prepareStatement(sql);
+		ResultSet rs = pstmt.executeQuery();
+
+Select选出值的用executeQuery操作，然后有rs.next()
+生成一个实体:   实体.set(rs.getString())
+
+2.表的生成
+需要构建一个列表实体：List<BooksBeReaded> booksbereaded
+创建一个滚动的窗口scrollPane
+列表实体    bookstoread = btrdao.show();
+列表实体放到一个tablemodel中，BooksToReadTableModel btrtm = new BooksToReadTableModel(bookstoread);
+table.setModel(btrtm);
+scrollPane.setViewportView(table);
+
+3.表一行选择后得到数据
+selectedRow = table.getSelectedRow();	//获取选择行
+				if(selectedRow < 0) {
+					return;
+				}else {
+					BooksToRead deletebook = null;
+					deletebook = bookstoread.get(selectedRow);		//获取选择行信息
+					try {
+						btrdao.deleteBook(deletebook);
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					refreshTable(scrollPane,table);
+				}
+
+从列对象bookstoread中找一行生成一个一行信息实体，然后调用dao进行处理。
+
+5.界面关闭
+JFrame.defaultCloseOperation(int option)
+•	JFrame.EXIT_ON_CLOSE -- 退出应用.
+•	运行applet时不要使用这个选项，因为会导致浏览器崩溃!
+•	JFrame.DISPOSE_ON_CLOSE -- 关闭和销毁frame, 不退出应用。
+•	JFrame.DO_NOTHING_ON_CLOSE -- 关闭但不销毁frame, 不退出应用.
+
+
+总结
+这是我的第一个JAVA项目，做了一款能自己用的书单管理系统，通过这个项目，主要学习了软件设计基础的分层结构，包括与数据库连接的工具层，中台数据的操作，从表面层拿数据、查数据然后返回数据，梳理数据时候打包的实体，还有前台的操作。入门了软件设计的架构基本思想，后续需要多从项目当中进行实战体会，需要学习软件架构的思想，主流的技术和方法，然后多实战。
+后续希望把这个移到web端进行操作，这会变得更加的方便，并且界面也会更为的好看。
